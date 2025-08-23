@@ -42,6 +42,9 @@ model Space {
     slug      String      @unique @regex('^[0-9a-zA-Z]{4,16}$')
     members   SpaceUser[]
     lists     List[]
+
+    //add tasks for back relation for Task model
+    tasks         Task[]
     
     // require login
     @@deny('all', auth() == null)
@@ -102,6 +105,9 @@ model User {
     image         String?     @url
     lists         List[]
     todos         Todo[]
+
+    //add tasks for back relation for Task model
+    tasks         Task[]
 
     // next-auth
     accounts      Account[]
@@ -182,7 +188,6 @@ model Task {
 
     owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     ownerId     String    @default(auth().id)
-
 
     space        Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
     spaceId      String
