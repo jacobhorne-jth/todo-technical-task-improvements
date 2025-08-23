@@ -171,6 +171,10 @@ model Todo {
     listId      String
     completedAt DateTime?
 
+    //replaced title with Task because Todo gets title from a Task template
+    task        Task      @relation(fields: [taskId], references: [id], onDelete: Restrict)
+    taskId      String
+
     // full access if the parent list is readable
     @@allow('all', check(list, 'read'))
 }
@@ -193,6 +197,9 @@ model Task {
 
     title       String    @length(1, 100)
     description String?
+
+    //Add todos for back relation for todo model changes
+    todos       Todo[]
 
     // full access if the parent space is readable
     @@allow('all', check(space, 'read'))
