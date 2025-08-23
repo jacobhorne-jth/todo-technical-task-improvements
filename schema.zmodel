@@ -170,6 +170,32 @@ model Todo {
     @@allow('all', check(list, 'read'))
 }
 
+
+/**
+ * Model for a single Task - Jacob Horne
+ */
+ 
+model Task {
+    id          String    @id @default(uuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId     String    @default(auth().id)
+
+
+    space        Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+    spaceId      String
+
+    title       String    @length(1, 100)
+    description String?
+
+    // full access if the parent space is readable
+    @@allow('all', check(space, 'read'))
+}
+
+
+
 /**
  * Next-auth user account
  */
