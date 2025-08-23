@@ -169,7 +169,6 @@ model Todo {
     ownerId     String    @default(auth().id)
     list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)
     listId      String
-    title       String    @length(1, 100)
     completedAt DateTime?
 
     // full access if the parent list is readable
@@ -189,8 +188,8 @@ model Task {
     owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     ownerId     String    @default(auth().id)
 
-    space        Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-    spaceId      String
+    space       Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+    spaceId     String
 
     title       String    @length(1, 100)
     description String?

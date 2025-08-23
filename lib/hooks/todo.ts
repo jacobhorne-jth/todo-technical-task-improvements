@@ -159,6 +159,6 @@ export function useCountTodo<T extends Prisma.TodoCountArgs>(args?: Prisma.Subse
     return request.useModelQuery('Todo', 'count', args, options);
 }
 
-export function useCheckTodo(args: { operation: PolicyCrudKind; where?: { id?: string; ownerId?: string; listId?: string; title?: string }; }, options?: QueryOptions<boolean>) {
+export function useCheckTodo(args: { operation: PolicyCrudKind; where?: { id?: string; ownerId?: string; listId?: string; taskId?: string }; }, options?: QueryOptions<boolean>) {
     return request.useModelQuery('Todo', 'check', args, options);
 }

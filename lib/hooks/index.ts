@@ -10,6 +10,7 @@ export * from './space-user';
 export * from './user';
 export * from './list';
 export * from './todo';
+export * from './task';
 export * from './account';
 export { Provider } from '@zenstackhq/swr/runtime';
 export { default as metadata } from './__model_meta';

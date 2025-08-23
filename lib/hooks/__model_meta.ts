@@ -55,6 +55,12 @@ const metadata = {
                     isDataModel: true,
                     isArray: true,
                     backLink: 'space',
+                }, tasks: {
+                    name: "tasks",
+                    type: "Task",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'space',
                 },
             }, uniqueConstraints: {
                 id: {
@@ -176,6 +182,12 @@ const metadata = {
                 }, todos: {
                     name: "todos",
                     type: "Todo",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'owner',
+                }, tasks: {
+                    name: "tasks",
+                    type: "Task",
                     isDataModel: true,
                     isArray: true,
                     backLink: 'owner',
@@ -303,13 +315,87 @@ const metadata = {
                     type: "String",
                     isForeignKey: true,
                     relationField: 'list',
-                }, title: {
-                    name: "title",
-                    type: "String",
                 }, completedAt: {
                     name: "completedAt",
                     type: "DateTime",
                     isOptional: true,
+                }, task: {
+                    name: "task",
+                    type: "Task",
+                    isDataModel: true,
+                    backLink: 'todos',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Restrict',
+                    foreignKeyMapping: { "id": "taskId" },
+                }, taskId: {
+                    name: "taskId",
+                    type: "String",
+                    isForeignKey: true,
+                    relationField: 'task',
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                },
+            },
+        },
+        task: {
+            name: 'Task', fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@updatedAt", "args": [] }],
+                }, owner: {
+                    name: "owner",
+                    type: "User",
+                    isDataModel: true,
+                    backLink: 'tasks',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "ownerId" },
+                }, ownerId: {
+                    name: "ownerId",
+                    type: "String",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                    defaultValueProvider: $default$Task$ownerId,
+                    isForeignKey: true,
+                    relationField: 'owner',
+                }, space: {
+                    name: "space",
+                    type: "Space",
+                    isDataModel: true,
+                    backLink: 'tasks',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "spaceId" },
+                }, spaceId: {
+                    name: "spaceId",
+                    type: "String",
+                    isForeignKey: true,
+                    relationField: 'space',
+                }, title: {
+                    name: "title",
+                    type: "String",
+                }, description: {
+                    name: "description",
+                    type: "String",
+                    isOptional: true,
+                }, todos: {
+                    name: "todos",
+                    type: "Todo",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'task',
                 },
             }, uniqueConstraints: {
                 id: {
@@ -393,8 +479,8 @@ const metadata = {
 
     },
     deleteCascade: {
-        space: ['SpaceUser', 'List'],
-        user: ['Space', 'SpaceUser', 'List', 'Todo', 'Account'],
+        space: ['SpaceUser', 'List', 'Task'],
+        user: ['Space', 'SpaceUser', 'List', 'Todo', 'Task', 'Account'],
         list: ['Todo'],
 
     },
@@ -411,6 +497,10 @@ function $default$List$ownerId(user: any): unknown {
 }
 
 function $default$Todo$ownerId(user: any): unknown {
+    return user?.id;
+}
+
+function $default$Task$ownerId(user: any): unknown {
     return user?.id;
 }
 export default metadata;
