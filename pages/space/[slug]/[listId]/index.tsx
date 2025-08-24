@@ -11,6 +11,9 @@ import { getEnhancedPrisma } from 'server/enhanced-db';
 //import taskselect component
 import TaskSelect from 'components/TaskSelect';
 
+//import addtask component
+import TaskQuickAdd from 'components/AddTask';
+
 
 
 type Props = {
@@ -64,6 +67,14 @@ export default function TodoList(props: Props) {
             </div>
             <div className="container w-full flex flex-col items-center py-12 mx-auto">
                 <h1 className="text-2xl font-semibold mb-4">{props.list?.title}</h1>
+
+                {/* Create a new Task in this Space; when created, auto-select it */}
+                <div className="mb-3">
+                    <TaskQuickAdd spaceId={props.space.id} onCreated={setTaskId} />
+                </div>
+
+
+
                 <div className="flex items-center gap-2 mt-2">
                     <div className="w-72">
                         <TaskSelect
