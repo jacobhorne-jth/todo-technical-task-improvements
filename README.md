@@ -38,3 +38,21 @@ DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@<POOLER_HOST>:54
 GITHUB_ID=
 GITHUB_SECRET=
 ```
+
+
+
+## Test Plan
+
+**Model & constraints**
+- Tasks unique per Space: creating duplicate `{spaceId,title}` fails.
+- Deleting a Task referenced by any Todo is blocked
+
+**Permissions**
+- Only Space members can read/create Tasks/Todos (covered by access policies).
+
+**UI flows**
+- Create Task inline -> appears in selector -> auto-selected.
+- Create Todo from selected Task → card shows Task title/description.
+- Edit Todo -> change linked Task -> card updates.
+- Delete unused Task -> succeeds; clears selected task if it was chosen.
+- Delete Task in use -> shows error; remains in list.
