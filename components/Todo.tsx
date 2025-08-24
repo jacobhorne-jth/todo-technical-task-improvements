@@ -1,12 +1,13 @@
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { useDeleteTodo, useUpdateTodo } from '@lib/hooks';
-import { Todo, User } from '@prisma/client';
+import { Todo, User, Task } from '@prisma/client';
 import { ChangeEvent } from 'react';
 import Avatar from './Avatar';
 import TimeInfo from './TimeInfo';
 
 type Props = {
-    value: Todo & { owner: User };
+    //include Task in the values
+    value: Todo & { owner: User; task: Task | null };
     optimistic?: boolean;
 };
 
@@ -36,7 +37,9 @@ export default function TodoComponent({ value, optimistic }: Props) {
                         value.completedAt ? 'line-through text-gray-400 italic' : 'text-gray-700'
                     }`}
                 >
-                    {value.title}
+                     {/* use task title instead of todo.title */}
+                     {/*{value.task?.title ?? <span className="opacity-50">Untitled task</span>}*/}
+                    {value.task?.title}
                     {optimistic && <span className="loading loading-spinner loading-sm ml-1"></span>}
                 </h3>
                 <div className="flex">
@@ -57,10 +60,15 @@ export default function TodoComponent({ value, optimistic }: Props) {
                     />
                 </div>
             </div>
-            <div className="flex justify-end w-full space-x-2">
-                <TimeInfo value={value} />
-                <Avatar user={value.owner} size={18} />
-            </div>
-        </div>
+
+            {value.task?.description && (
+                <div className="w-full mb-3 text-sm text-gray-600">{value.task.description}</div>
+                )}
+
+                    <div className="flex justify-end w-full space-x-2">
+                        <TimeInfo value={value} />
+                        <Avatar user={value.owner} size={18} />
+                    </div>
+                </div>
     );
 }
