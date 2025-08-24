@@ -13,6 +13,8 @@ import TaskSelect from 'components/TaskSelect';
 
 //import addtask component
 import TaskQuickAdd from 'components/AddTask';
+import TaskList from 'components/TaskList';
+
 
 
 
@@ -25,6 +27,8 @@ export default function TodoList(props: Props) {
     //use taskId instead of title
     //const [title, setTitle] = useState('');
     const [taskId, setTaskId] = useState('');
+    const [showTasks, setShowTasks] = useState(false);
+
     
     const { trigger: createTodo } = useCreateTodo({ optimisticUpdate: true });
 
@@ -74,7 +78,38 @@ export default function TodoList(props: Props) {
                 </div>
 
 
+                {/* Toggle to avoid clutter: show/hide the space’s task catalog.
+                aria-expanded improves toggles showing and hiding; type="button" avoids submitting any form. */}
+                <button
+                        type="button"
+                        aria-expanded={showTasks}
+                        onClick={() => setShowTasks((v) => !v)}
+                        className="btn btn-sm btn-ghost"
+                        >
+                        {showTasks ? 'Hide tasks' : 'Show tasks'}
+                        </button>
+                
+                {/* Container for the optional Task list*/}
+                <div className="mt-6 w-full flex flex-col items-center">
+                    <div className="w-full lg:w-[480px]">
+                        
+                        {/* Only render when show tasks is toggled on. TaskList will revalidate itself after deletes. 
+                        onDeleted clears the currently selected task if it was removed. */}
+                        {showTasks && (
+                        <div className="mt-2">
+                            <TaskList
+                            spaceId={props.space.id}
+                            onDeleted={(id) => {
+                                if (taskId === id) setTaskId('');
+                            }}
+                            />
+                        </div>
+                        )}
+                    </div>
+                    </div>
 
+
+                {/*Add Todo from a Task*/}
                 <div className="flex items-center gap-2 mt-2">
                     <div className="w-72">
                         <TaskSelect
