@@ -112,25 +112,33 @@ export default function TodoList(props: Props) {
                     </div>
 
 
-                {/*Add Todo from a Task*/}
-                <div className="flex items-center gap-2 mt-2">
-                    <div className="w-72">
-                        {/*switch to taskselectandcreate instead of old dropdown taskselect*/}
-                        <TaskSelectAndCreate
+                {/* Make a Todo from a Task */}
+                <div className="mt-10 w-full flex flex-col items-center">
+                <h2 className="text-sm font-semibold tracking-wide text-gray-600 uppercase mb-2">
+                    Make a Todo
+                </h2>
+
+                <div className="flex items-center gap-2 w-full lg:w-[480px]">
+                    <div className="flex-1">
+                    {/* switch to TaskSelectAndCreate to no longer use the dropdown, instead use the typing to search */}
+                    <TaskSelectAndCreate
                         spaceId={props.space.id}
                         value={taskId}
                         onChange={setTaskId}
-                        />
+                    />
                     </div>
+
                     <button
-                        onClick={_createTodo}
-                        disabled={!taskId}
-                        className="rounded-xl border px-3 py-2 disabled:opacity-50"
-                        title={!taskId ? 'Pick a task first' : 'Add todo'}
+                    onClick={_createTodo}
+                    disabled={!taskId}
+                    className="rounded-xl border px-3 py-2 disabled:opacity-50"
+                    title={!taskId ? 'Pick a task first' : 'Add todo'}
                     >
-                        <PlusIcon className="w-6 h-6 text-gray-500" />
+                    <PlusIcon className="w-6 h-6 text-gray-500" />
                     </button>
-                    </div>
+                </div>
+                </div>
+
 
 
                 <ul className="flex flex-col space-y-4 py-8 w-11/12 md:w-auto">
