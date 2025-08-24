@@ -9,7 +9,8 @@ import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { getEnhancedPrisma } from 'server/enhanced-db';
 
 //import taskselect component
-import TaskSelect from 'components/TaskSelect';
+//import TaskSelect from 'components/TaskSelect';
+import TaskSelectAndCreate from 'components/TaskSelectAndCreate';
 
 //import addtask component
 import TaskQuickAdd from 'components/AddTask';
@@ -114,7 +115,8 @@ export default function TodoList(props: Props) {
                 {/*Add Todo from a Task*/}
                 <div className="flex items-center gap-2 mt-2">
                     <div className="w-72">
-                        <TaskSelect
+                        {/*switch to taskselectandcreate instead of old dropdown taskselect*/}
+                        <TaskSelectAndCreate
                         spaceId={props.space.id}
                         value={taskId}
                         onChange={setTaskId}
