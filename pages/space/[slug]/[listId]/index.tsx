@@ -39,6 +39,8 @@ export default function TodoList(props: Props) {
                 owner: true,
                 //include task when loading todos
                 task: true,
+                //include list's spaceId so knows which tasks to show
+                list: { select: { spaceId: true } },
             },
             orderBy: {
                 createdAt: 'desc',

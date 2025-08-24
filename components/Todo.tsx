@@ -1,19 +1,26 @@
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { useDeleteTodo, useUpdateTodo } from '@lib/hooks';
 import { Todo, User, Task } from '@prisma/client';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import Avatar from './Avatar';
 import TimeInfo from './TimeInfo';
 
+//import TaskSelect for use in the switching associated task of a todo
+import TaskSelect from 'components/TaskSelect';
+
 type Props = {
     //include Task in the values
-    value: Todo & { owner: User; task: Task | null };
+    //also include list's spaceId so knows which Tasks to display
+    value: Todo & { owner: User; task: Task | null; list: { spaceId: string } };
     optimistic?: boolean;
 };
 
 export default function TodoComponent({ value, optimistic }: Props) {
     const { trigger: updateTodo } = useUpdateTodo({ optimisticUpdate: true });
     const { trigger: deleteTodo } = useDeleteTodo({ optimisticUpdate: true });
+
+    //for editing the task associated with a todo
+    const [editing, setEditing] = useState(false);
 
     const onDeleteTodo = () => {
         void deleteTodo({ where: { id: value.id } });
@@ -69,6 +76,28 @@ export default function TodoComponent({ value, optimistic }: Props) {
                         <TimeInfo value={value} />
                         <Avatar user={value.owner} size={18} />
                     </div>
+
+                    {/*Small change task button to edit task associated with a todo*/}
+                    <div className="w-full mb-3">
+                        <button className="text-xs text-blue-600" onClick={() => setEditing(v => !v)}>
+                            {editing ? 'Cancel' : 'Change task'}
+                        </button>
+                        {editing && (
+                            <div className="mt-2">
+                            <TaskSelect
+                                spaceId={value.list.spaceId}
+                                value={value.task?.id}
+                                onChange={(newTaskId) => {
+                                void updateTodo({
+                                    where: { id: value.id },
+                                    data: { task: { connect: { id: newTaskId } } },
+                                });
+                                setEditing(false);
+                                }}
+                            />
+                            </div>
+                        )}
+                        </div>
                 </div>
     );
 }
