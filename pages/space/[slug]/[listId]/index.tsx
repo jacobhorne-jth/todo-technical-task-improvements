@@ -8,13 +8,21 @@ import { GetServerSideProps } from 'next';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { getEnhancedPrisma } from 'server/enhanced-db';
 
+//import taskselect component
+import TaskSelect from 'components/TaskSelect';
+
+
+
 type Props = {
     space: Space;
     list: List;
 };
 
 export default function TodoList(props: Props) {
-    const [title, setTitle] = useState('');
+    //use taskId instead of title
+    //const [title, setTitle] = useState('');
+    const [taskId, setTaskId] = useState('');
+    
     const { trigger: createTodo } = useCreateTodo({ optimisticUpdate: true });
 
     const { data: todos } = useFindManyTodo(
@@ -22,6 +30,8 @@ export default function TodoList(props: Props) {
             where: { listId: props.list.id },
             include: {
                 owner: true,
+                //include task when loading todos
+                task: true,
             },
             orderBy: {
                 createdAt: 'desc',
@@ -31,13 +41,16 @@ export default function TodoList(props: Props) {
     );
 
     const _createTodo = () => {
+        if (!taskId) return;
         void createTodo({
             data: {
-                title,
                 list: { connect: { id: props.list.id } },
+                //use the selected task
+                task: { connect: { id: taskId } },
             },
         });
-        setTitle('');
+        //change to task instead of title
+        setTaskId('');
     };
 
     if (!props.space || !props.list) {
@@ -51,25 +64,24 @@ export default function TodoList(props: Props) {
             </div>
             <div className="container w-full flex flex-col items-center py-12 mx-auto">
                 <h1 className="text-2xl font-semibold mb-4">{props.list?.title}</h1>
-                <div className="flex space-x-2">
-                    <input
-                        type="text"
-                        placeholder="Type a title and press enter"
-                        className="input input-bordered w-72 max-w-xs mt-2"
-                        value={title}
-                        onKeyUp={(e: KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === 'Enter') {
-                                _createTodo();
-                            }
-                        }}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setTitle(e.currentTarget.value);
-                        }}
-                    />
-                    <button onClick={() => _createTodo()}>
+                <div className="flex items-center gap-2 mt-2">
+                    <div className="w-72">
+                        <TaskSelect
+                        spaceId={props.space.id}
+                        value={taskId}
+                        onChange={setTaskId}
+                        />
+                    </div>
+                    <button
+                        onClick={_createTodo}
+                        disabled={!taskId}
+                        className="rounded-xl border px-3 py-2 disabled:opacity-50"
+                        title={!taskId ? 'Pick a task first' : 'Add todo'}
+                    >
                         <PlusIcon className="w-6 h-6 text-gray-500" />
                     </button>
-                </div>
+                    </div>
+
 
                 <ul className="flex flex-col space-y-4 py-8 w-11/12 md:w-auto">
                     {todos?.map((todo) => (
