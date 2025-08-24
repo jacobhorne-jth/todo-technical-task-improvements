@@ -201,8 +201,16 @@ model Task {
     //Add todos for back relation for todo model changes
     todos       Todo[]
 
-    // full access if the parent space is readable
-    @@allow('all', check(space, 'read'))
+
+    // ensures that the task is unique to the space
+    @@unique([spaceId, title])
+
+    // all users can read and create
+    // only owner or admins can update or delete tasks
+    @@allow('read',   space.members?[user == auth()])
+    @@allow('create', space.members?[user == auth()])
+    @@allow('update,delete', owner == auth() || space.members?[user == auth() && role == ADMIN])
+
 }
 
 

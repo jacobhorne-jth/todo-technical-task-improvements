@@ -12,6 +12,9 @@
 - added Task creation using two fields for title and description, created Task auto-selects in the picker
 - added TaskList with show and hide button toggle and ability to delete tasks
   - message blocking from deleting if existing Todo uses Task that you are trying to delete
+- added editing for todos, can view and select Task from list
+- added access policies enforcing unique tasks per space
+  - and different access for editing and deleting tasks if admin/owner
 
 
 ## How to run my fork locally
