@@ -5,7 +5,7 @@ import BreadCrumb from 'components/BreadCrumb';
 import TodoComponent from 'components/Todo';
 import WithNavBar from 'components/WithNavBar';
 import { GetServerSideProps } from 'next';
-import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { useState } from 'react';
 import { getEnhancedPrisma } from 'server/enhanced-db';
 
 // import task selection UI (replaces plain title input for Todos)
