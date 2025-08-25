@@ -26,9 +26,9 @@ export default function TaskList(props: Props) {
              then revalidate with mutate() to refresh the list from the server. */}
           <TaskComponent
             value={t}
-            onDeleted={async (id) => {
+            onDeleted={(id) => {
               props.onDeleted?.(id);
-              await mutate(); // refresh the list after deletion
+              void mutate(); // refresh the list after deletion
             }}
           />
         </li>

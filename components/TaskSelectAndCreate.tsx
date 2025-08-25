@@ -21,6 +21,13 @@ export default function TaskSelectWithCreate({ spaceId, value, onChange }: Props
     take: 10,
   });
 
+  // Keep the input text in sync when parent controls `value` (selected task)
+  React.useEffect(() => {
+    if (!value) return;
+    const selected = (tasks ?? []).find(t => t.id === value);
+    if (selected) setQ(selected.title);
+  }, [value, tasks]);
+
   const list = tasks ?? [];
   // Detect an exact title match (normalized for trim + lower case) to decide if "Create" should be shown/enabled.
   const exact = list.find(
@@ -109,7 +116,7 @@ export default function TaskSelectWithCreate({ spaceId, value, onChange }: Props
           type="button"
           className="btn btn-sm mt-2"
           onMouseDown={(e) => e.preventDefault()} // keep focus so onClick reliably fires
-          onClick={createNew}
+          onClick={() => { void createNew(); }}
           disabled={isMutating}
         >
           Create “{q.trim()}”

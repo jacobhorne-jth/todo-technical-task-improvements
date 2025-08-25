@@ -50,10 +50,14 @@ export default function TaskQuickAdd(props: Props) {
       if (created?.id) props.onCreated?.(created.id);
       setTitle('');
       setDescription('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // if two clicks race, Prisma throws P2002; show a friendly message
+      const message =
+        (typeof err === 'object' && err !== null && 'message' in err)
+          ? String((err as { message?: unknown }).message)
+          : '';
       const msg =
-        String(err?.message || '').includes('P2002')
+        message.includes('P2002')
           ? 'A task with this exact title already exists in this space.'
           : 'Could not create task. Please try again.';
       setError(msg);
@@ -61,7 +65,7 @@ export default function TaskQuickAdd(props: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="flex items-center gap-2">
+    <form onSubmit={(e) => { void submit(e); }} className="flex items-center gap-2">
         
       <input
         className="input input-bordered w-56"

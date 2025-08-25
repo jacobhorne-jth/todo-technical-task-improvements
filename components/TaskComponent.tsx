@@ -41,7 +41,7 @@ export default function TaskComponent({ value, optimistic, onDeleted }: Props) {
           optimistic ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 cursor-pointer'
         }`}
         onClick={() => {
-          !optimistic && onDelete();
+          !optimistic && void onDelete();
         }}
       />
     </div>
