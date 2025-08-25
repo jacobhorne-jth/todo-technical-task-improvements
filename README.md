@@ -1,5 +1,8 @@
 # SENS Technical Task – Feature Progress + Status
 
+
+**Live deployed vercel:** https://todo-technical-task-improvements.vercel.app/
+
 - Cloned repo
 - installed dependencies
 - updated `.env` file to connect to supabase
@@ -18,6 +21,7 @@
 - added type to select task, changed previous task selection
 - updated theme to match sens website
 - used sens background image and logo
+- documentation: expanded README with run steps, environment setup, deploy notes, and a thorough test plan
 
 ___
 
