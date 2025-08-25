@@ -10,6 +10,7 @@ type Props = {
 };
 
 export default function TaskList(props: Props) {
+  // Load up to 100 Tasks for this Space, sorted by title for a stable catalog view
   const { data: tasks, mutate } = useFindManyTask({
     where: { spaceId: props.spaceId },
     orderBy: { title: 'asc' },
@@ -20,6 +21,9 @@ export default function TaskList(props: Props) {
     <ul className="flex flex-col gap-2 py-2">
       {(tasks ?? []).map((t: Task) => (
         <li key={t.id}>
+          {/* Delegate per-item rendering to TaskComponent.
+             After a child deletes an item, call parent onDeleted (if provided),
+             then revalidate with mutate() to refresh the list from the server. */}
           <TaskComponent
             value={t}
             onDeleted={async (id) => {
@@ -29,6 +33,7 @@ export default function TaskList(props: Props) {
           />
         </li>
       ))}
+      {/* Simple empty state when the space has no Tasks yet */}
       {(!tasks || tasks.length === 0) && (
         <li className="text-sm opacity-70">No tasks yet.</li>
       )}

@@ -1,3 +1,6 @@
+//IMPORTANT
+//use TaskSelectAndCreate now instead
+//this file is for just selecting from a simple dropdown
 import * as React from 'react';
 import { useFindManyTask } from 'lib/hooks';
 

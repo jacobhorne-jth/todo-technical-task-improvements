@@ -97,6 +97,8 @@ model Task {
   title       String
   description String?
   todos       Todo[]
+
+  @@unique([spaceId, title])
 }
 
 model Account {

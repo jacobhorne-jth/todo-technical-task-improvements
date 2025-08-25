@@ -5,7 +5,8 @@ import { ChangeEvent, useState } from 'react';
 import Avatar from './Avatar';
 import TimeInfo from './TimeInfo';
 
-//import TaskSelect for use in the switching associated task of a todo
+// Added: ability to switch a Todo's associated Task inline
+// (uses a Task picker scoped to the Todo's Space)
 import TaskSelect from 'components/TaskSelect';
 
 type Props = {
@@ -19,7 +20,7 @@ export default function TodoComponent({ value, optimistic }: Props) {
     const { trigger: updateTodo } = useUpdateTodo({ optimisticUpdate: true });
     const { trigger: deleteTodo } = useDeleteTodo({ optimisticUpdate: true });
 
-    //for editing the task associated with a todo
+    // New: local UI state to toggle the "Change task" editor
     const [editing, setEditing] = useState(false);
 
     const onDeleteTodo = () => {
@@ -46,6 +47,7 @@ export default function TodoComponent({ value, optimistic }: Props) {
                 >
                      {/* use task title instead of todo.title */}
                      {/*{value.task?.title ?? <span className="opacity-50">Untitled task</span>}*/}
+                    {/* Change: render the normalized label from the linked Task */}
                     {value.task?.title}
                     {optimistic && <span className="loading loading-spinner loading-sm ml-1"></span>}
                 </h3>
@@ -68,6 +70,7 @@ export default function TodoComponent({ value, optimistic }: Props) {
                 </div>
             </div>
 
+            {/* New: show Task description (if any) beneath the title */}
             {value.task?.description && (
                 <div className="w-full mb-3 text-sm text-gray-600">{value.task.description}</div>
                 )}
@@ -78,6 +81,7 @@ export default function TodoComponent({ value, optimistic }: Props) {
                     </div>
 
                     {/*Small change task button to edit task associated with a todo*/}
+                    {/* New UX affordance: inline switcher to reassign the Todo to a different Task */}
                     <div className="w-full mb-3">
                         <button className="text-xs text-blue-600" onClick={() => setEditing(v => !v)}>
                             {editing ? 'Cancel' : 'Change task'}
@@ -88,6 +92,7 @@ export default function TodoComponent({ value, optimistic }: Props) {
                                 spaceId={value.list.spaceId}
                                 value={value.task?.id}
                                 onChange={(newTaskId) => {
+                                // On selection, persist reassignment via relation connect
                                 void updateTodo({
                                     where: { id: value.id },
                                     data: { task: { connect: { id: newTaskId } } },

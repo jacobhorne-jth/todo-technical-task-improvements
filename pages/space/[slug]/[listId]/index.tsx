@@ -8,12 +8,13 @@ import { GetServerSideProps } from 'next';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { getEnhancedPrisma } from 'server/enhanced-db';
 
-//import taskselect component
-//import TaskSelect from 'components/TaskSelect';
+// import task selection UI (replaces plain title input for Todos)
+// NOTE: I switched from a dropdown to a typeahead-style selector that can also create.
+ //import TaskSelect from 'components/TaskSelect';
 import TaskSelectAndCreate from 'components/TaskSelectAndCreate';
 
-//import addtask component
-import TaskQuickAdd from 'components/AddTask';
+// quick-add and manage the space’s Task catalog
+import AddTask from 'components/AddTask';
 import TaskList from 'components/TaskList';
 
 
@@ -25,9 +26,10 @@ type Props = {
 };
 
 export default function TodoList(props: Props) {
-    //use taskId instead of title
+    // STATE CHANGE: Todos are now created from a Task, so we track a taskId instead of a free-text title.
     //const [title, setTitle] = useState('');
     const [taskId, setTaskId] = useState('');
+    // NEW: toggle for showing/hiding the Task catalog (avoid clutter)
     const [showTasks, setShowTasks] = useState(false);
 
     
@@ -38,9 +40,9 @@ export default function TodoList(props: Props) {
             where: { listId: props.list.id },
             include: {
                 owner: true,
-                //include task when loading todos
+                // NEW: include the linked Task so the card can show task.title/description
                 task: true,
-                //include list's spaceId so knows which tasks to show
+                // NEW: include list.spaceId so the selector knows which Tasks to query for this space
                 list: { select: { spaceId: true } },
             },
             orderBy: {
@@ -51,15 +53,16 @@ export default function TodoList(props: Props) {
     );
 
     const _createTodo = () => {
+        // GUARD: require a Task selection before creating a Todo
         if (!taskId) return;
         void createTodo({
             data: {
                 list: { connect: { id: props.list.id } },
-                //use the selected task
+                // CHANGE: instead of persisting a title, connect the Todo to the chosen Task
                 task: { connect: { id: taskId } },
             },
         });
-        //change to task instead of title
+        // RESET: clear task selection after creating a Todo
         setTaskId('');
     };
 
@@ -75,14 +78,14 @@ export default function TodoList(props: Props) {
             <div className="container w-full flex flex-col items-center py-12 mx-auto">
                 <h1 className="text-2xl font-semibold mb-4">{props.list?.title}</h1>
 
-                {/* Create a new Task in this Space; when created, auto-select it */}
+                {/* NEW: Inline Task creator. When a Task is created, auto-select it for quick Todo creation. */}
                 <div className="mb-3">
-                    <TaskQuickAdd spaceId={props.space.id} onCreated={setTaskId} />
+                    <AddTask spaceId={props.space.id} onCreated={setTaskId} />
                 </div>
 
 
-                {/* Toggle to avoid clutter: show/hide the space’s task catalog.
-                aria-expanded improves toggles showing and hiding; type="button" avoids submitting any form. */}
+                {/* NEW: Show/Hide the Task catalog to keep the screen clean.
+                   aria-expanded for a11y; type="button" avoids accidental form submit. */}
                 <button
                         type="button"
                         aria-expanded={showTasks}
@@ -92,7 +95,7 @@ export default function TodoList(props: Props) {
                         {showTasks ? 'Hide tasks' : 'Show tasks'}
                         </button>
                 
-                {/* Container for the optional Task list*/}
+                {/* NEW: Optional Task list (with delete). Clears selection if a selected Task gets deleted. */}
                 <div className="mt-6 w-full flex flex-col items-center">
                     <div className="w-full lg:w-[480px]">
                         
@@ -112,7 +115,7 @@ export default function TodoList(props: Props) {
                     </div>
 
 
-                {/* Make a Todo from a Task */}
+                {/* NEW: “Make a Todo” from a Task using a searchable, creatable selector */}
                 <div className="mt-10 w-full flex flex-col items-center">
                 <h2 className="text-sm font-semibold tracking-wide text-gray-600 uppercase mb-2">
                     Make a Todo
@@ -120,7 +123,7 @@ export default function TodoList(props: Props) {
 
                 <div className="flex items-center gap-2 w-full lg:w-[480px]">
                     <div className="flex-1">
-                    {/* switch to TaskSelectAndCreate to no longer use the dropdown, instead use the typing to search */}
+                    {/* CHANGE: switched to TaskSelectAndCreate (type-to-search + create inline) */}
                     <TaskSelectAndCreate
                         spaceId={props.space.id}
                         value={taskId}
@@ -128,6 +131,7 @@ export default function TodoList(props: Props) {
                     />
                     </div>
 
+                    {/* ACTION: Create the Todo by connecting the selected Task */}
                     <button
                     onClick={_createTodo}
                     disabled={!taskId}

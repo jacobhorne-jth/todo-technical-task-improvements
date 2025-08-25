@@ -401,6 +401,9 @@ const metadata = {
                 id: {
                     name: "id",
                     fields: ["id"]
+                }, spaceId_title: {
+                    name: "spaceId_title",
+                    fields: ["spaceId", "title"]
                 },
             },
         },

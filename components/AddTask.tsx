@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCreateTask } from '@lib/hooks';
+import { useCreateTask, useFindManyTask } from '@lib/hooks';
 
 type Props = {
   spaceId: string;
@@ -10,26 +10,54 @@ export default function TaskQuickAdd(props: Props) {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
 
+  //for error checking for the unique tasks constraint
+  const [error, setError] = React.useState('');
+
   const { trigger: createTask, isMutating } = useCreateTask();
+
+
+  //load tasks in this space
+  const { data: tasks } = useFindManyTask({ where: { spaceId: props.spaceId }, take: 200 });
+
+
+  //checks only for exact matches, different caps = different tasks, only checks title
+  const trimmed = title.trim();
+  const existsExact = React.useMemo(
+    () => (tasks ?? []).some(t => (t.title ?? '').trim() === trimmed),
+    [tasks, trimmed]
+  );
+  const canCreate = trimmed.length > 0 && !existsExact;
 
 
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const t = title.trim();
-    if (!t) return;
+    setError('');
 
-    const created = await createTask({
-      data: {
-        title: t,
-        ...(description.trim() ? { description: description.trim() } : {}),
-        space: { connect: { id: props.spaceId } }, // ownerId comes from @default(auth().id)
-      },
-    });
 
-    if (created?.id) props.onCreated?.(created.id);
-    setTitle('');
-    setDescription('');
+    const t = trimmed;
+    if (!t || !canCreate) return;
+
+    try {
+      const created = await createTask({
+        data: {
+          title: t,
+          ...(description.trim() ? { description: description.trim() } : {}),
+          space: { connect: { id: props.spaceId } }, // ownerId comes from @default(auth().id)
+        },
+      });
+
+      if (created?.id) props.onCreated?.(created.id);
+      setTitle('');
+      setDescription('');
+    } catch (err: any) {
+      // if two clicks race, Prisma throws P2002; show a friendly message
+      const msg =
+        String(err?.message || '').includes('P2002')
+          ? 'A task with this exact title already exists in this space.'
+          : 'Could not create task. Please try again.';
+      setError(msg);
+    }
   }
 
   return (
@@ -49,10 +77,19 @@ export default function TaskQuickAdd(props: Props) {
         onChange={(e) => setDescription(e.currentTarget.value)}
       />
 
-      <button className="btn" disabled={!title.trim() || isMutating} type="submit">
+      <button
+        className="btn btn-primary"
+        disabled={!canCreate || isMutating}
+        title={!trimmed ? 'Enter a title' : existsExact ? 'Task already exists' : 'Add Task'}
+        type="submit"
+      >
         Add Task
       </button>
 
+      {existsExact && trimmed && (
+        <p className="text-sm text-error ml-2">A task named “{trimmed}” already exists.</p>
+      )}
+      {!!error && <p className="text-sm text-error ml-2">{error}</p>}
     </form>
   );
 }
