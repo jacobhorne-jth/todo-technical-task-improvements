@@ -15,6 +15,9 @@
 - added editing for todos, can view and select Task from list
 - added access policies enforcing unique tasks per space
   - and different access for editing and deleting tasks if admin/owner
+- added type to select task, changed previous task selection
+- updated theme to match sens website
+- used sens background image and logo
 
 
 ## How to run my fork locally
